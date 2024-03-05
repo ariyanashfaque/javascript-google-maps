@@ -10,9 +10,11 @@ import { Component, ElementRef, OnInit, ViewChild } from "@angular/core";
   styleUrls: ["./maps.component.scss"],
 })
 export class MapsComponent implements OnInit {
+  map: google.maps.Map;
   mapMptions: google.maps.MapOptions;
   mapCenter: google.maps.LatLngLiteral;
-  @ViewChild("map", { static: true }) map: ElementRef;
+  mapMarker: google.maps.marker.AdvancedMarkerElement;
+  @ViewChild("mapRef", { static: true }) mapRef: ElementRef;
 
   constructor() {
     this.mapCenter = { lat: 23.7731, lng: 90.3657 };
@@ -26,6 +28,7 @@ export class MapsComponent implements OnInit {
       center: this.mapCenter,
       disableDefaultUI: true,
       streetViewControl: false,
+      // mapId: "7ed9fa6a25fc4b65",
       keyboardShortcuts: false,
       disableDoubleClickZoom: true,
       mapTypeControlOptions: {
@@ -37,27 +40,41 @@ export class MapsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.map.nativeElement);
     this.InitializeMap();
   }
 
-  ionViewDidEnter(): void {
-    // this.InitializeMap();
-  }
+  ionViewDidEnter(): void {}
 
-  InitializeMap = () => {
+  InitializeMap = async () => {
     const loader = new Loader({
       version: "weekly",
       apiKey: environment.browserKey,
     });
 
-    loader
-      .importLibrary("maps")
-      .then(({ Map }) => {
-        new Map(this.map.nativeElement, this.mapMptions);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    const { Map } = await loader.importLibrary("maps");
+    this.map = new Map(this.mapRef.nativeElement, this.mapMptions);
+
+    const { Marker } = (await google.maps.importLibrary(
+      "marker"
+    )) as google.maps.MarkerLibrary;
+
+    // console.log(this.map);
+
+    const marker = new Marker({
+      map: this.map,
+      title: "Uluru",
+      position: this.mapCenter,
+    });
+
+    // console.log(marker.position);
+
+    // loader
+    //   .importLibrary("maps")
+    //   .then(({ Map }) => {
+    //     new Map(this.mapRef.nativeElement, this.mapMptions);
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
   };
 }
