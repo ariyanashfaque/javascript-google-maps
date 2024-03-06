@@ -46,35 +46,29 @@ export class MapsComponent implements OnInit {
   ionViewDidEnter(): void {}
 
   InitializeMap = async () => {
-    const loader = new Loader({
+    new Loader({
       version: "weekly",
       apiKey: environment.browserKey,
     });
 
-    const { Map } = await loader.importLibrary("maps");
+    const { Map } = await this.ImportMapsLibrary("maps");
     this.map = new Map(this.mapRef.nativeElement, this.mapMptions);
+  };
 
-    const { Marker } = (await google.maps.importLibrary(
-      "marker"
-    )) as google.maps.MarkerLibrary;
-
-    // console.log(this.map);
+  AddMarker = async () => {
+    const { Marker } = await this.ImportMapsMarkerLibrary("marker");
 
     const marker = new Marker({
       map: this.map,
       title: "Uluru",
       position: this.mapCenter,
     });
+  };
 
-    // console.log(marker.position);
-
-    // loader
-    //   .importLibrary("maps")
-    //   .then(({ Map }) => {
-    //     new Map(this.mapRef.nativeElement, this.mapMptions);
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
+  ImportMapsLibrary = async (type: string) => {
+    return (await google.maps.importLibrary(type)) as google.maps.MapsLibrary;
+  };
+  ImportMapsMarkerLibrary = async (type: string) => {
+    return (await google.maps.importLibrary(type)) as google.maps.MarkerLibrary;
   };
 }
